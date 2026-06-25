@@ -24,8 +24,15 @@ fun TerminalScreen(viewModel: TerminalViewModel = hiltViewModel()) {
     val output by viewModel.output.collectAsState()
     val input by viewModel.input.collectAsState()
     Column(modifier = Modifier.fillMaxSize().background(color = androidx.compose.ui.graphics.Color(0xFF1E1E1E))) {
-        TopAppBar(title = { Text("Terminal", fontWeight = FontWeight.Bold, color = DarkOnBg) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = androidx.compose.ui.graphics.Color(0xFF2D2D2D)),
-            actions = { IconButton(onClick = { viewModel.clear() }) { Icon(Icons.Default.DeleteSweep, contentDescription = "Clear", tint = BabyPink) } } }
+        TopAppBar(
+            title = { Text("Terminal", fontWeight = FontWeight.Bold, color = DarkOnBg) },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = androidx.compose.ui.graphics.Color(0xFF2D2D2D)),
+            actions = {
+                IconButton(onClick = { viewModel.clear() }) {
+                    Icon(Icons.Default.DeleteSweep, contentDescription = "Clear", tint = BabyPink)
+                }
+            }
+        )
         LazyColumn(modifier = Modifier.weight(1f).padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             items(output) { line ->
                 Text(line, color = androidx.compose.ui.graphics.Color(0xFF00FF00), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()))
