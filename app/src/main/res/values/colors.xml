@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="baby_purple_50">#F3E5F5</color>
+    <color name="baby_purple_200">#CE93D8</color>
+    <color name="baby_purple_500">#9C27B0</color>
+    <color name="baby_purple_700">#7B1FA2</color>
+    <color name="baby_purple_900">#4A148C</color>
+    <color name="baby_pink_500">#EC407A</color>
+    <color name="dark_bg">#0F0F1A</color>
+    <color name="dark_surface">#1A1A2E</color>
+    <color name="dark_surface_variant">#25253D</color>
+    <color name="dark_on_bg">#E8E6F0</color>
+    <color name="dark_on_surface">#C8C6D6</color>
+    <color name="dark_outline">#3A3A5C</color>
+</resources>

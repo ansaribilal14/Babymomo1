@@ -1,0 +1,64 @@
+name: Build & Release APK
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.4'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Upload Debug APK to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "BabyMomo v1.0.0"
+          body: |
+            ## BabyMomo v1.0.0 — First Release
+
+            A private AI companion for Android with bi-temporal memory, on-device inference, and interactive UI generation.
+
+            ### Features
+            - Streaming chat with memory citations
+            - 4-type memory system (Working, Episodic, Semantic, Procedural)
+            - Memory promotion (hitCount >= 5 → permanent context)
+            - LLM provider chain (Local → Remote → Mock)
+            - OpenAI / NVIDIA NIM / OpenRouter support
+            - 5 specialist agents + 6 skills + 5 tools
+            - Interactive AI-generated screens (quizzes, dashboards, games)
+            - Linux sandbox (proot Alpine)
+            - Heartbeat autonomous check-ins
+            - SQLCipher encrypted database
+            - Dark purple theme
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
