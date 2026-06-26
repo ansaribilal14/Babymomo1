@@ -14,5 +14,5 @@ class CalendarTool @Inject constructor() : ToolExecutor {
         """{"type":"object","properties":{"days_ahead":{"type":"integer"}}}"""
     ).jsonObject
 
-    suspend fun execute(input: String): String = "Calendar events (mock - requires calendar permission)"
+    override suspend fun execute(input: String): String = "Calendar events (mock - requires calendar permission)"
 }

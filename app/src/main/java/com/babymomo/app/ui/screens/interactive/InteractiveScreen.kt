@@ -5,13 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.babymomo.app.core.interactive.InteractiveScreenParser
-import com.babymomo.app.core.interactive.ScreenDescriptor
+import com.babymomo.app.core.interactive.BabyWidget
 import com.babymomo.app.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +39,7 @@ fun InteractiveScreen(descriptorJson: String, navController: NavController? = nu
         containerColor = DarkBg
     ) { padding ->
         if (descriptor != null) {
-            InteractiveScreenRenderer(descriptor = descriptor, modifier = Modifier.padding(padding))
+            WidgetList(widgets = descriptor.widgets, modifier = Modifier.padding(padding))
         } else {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Text("Invalid screen descriptor", color = DarkOnSurface)
@@ -47,63 +49,102 @@ fun InteractiveScreen(descriptorJson: String, navController: NavController? = nu
 }
 
 @Composable
-private fun InteractiveScreenRenderer(descriptor: ScreenDescriptor, modifier: Modifier = Modifier) {
+private fun WidgetList(widgets: List<BabyWidget>, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        descriptor.widgets.forEach { widget ->
-            when (widget) {
-                is com.babymomo.app.core.interactive.BabyWidget.Text -> {
-                    Text(
-                        text = widget.content,
-                        style = when (widget.style) {
-                            "h1" -> MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, color = DarkOnBg)
-                            "h2" -> MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold, color = DarkOnBg)
-                            "h3" -> MaterialTheme.typography.titleLarge.copy(color = DarkOnBg)
-                            "body" -> MaterialTheme.typography.bodyLarge.copy(color = DarkOnSurface)
-                            else -> MaterialTheme.typography.bodyMedium.copy(color = DarkOnSurface)
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+        widgets.forEach { widget ->
+            WidgetItem(widget = widget)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+@Composable
+private fun WidgetItem(widget: BabyWidget) {
+    when (widget) {
+        is BabyWidget.BabyText -> {
+            Text(
+                text = widget.text,
+                style = when (widget.style) {
+                    "h1" -> MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, color = DarkOnBg)
+                    "h2" -> MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold, color = DarkOnBg)
+                    "h3" -> MaterialTheme.typography.titleLarge.copy(color = DarkOnBg)
+                    "body" -> MaterialTheme.typography.bodyLarge.copy(color = DarkOnSurface)
+                    else -> MaterialTheme.typography.bodyMedium.copy(color = DarkOnSurface)
                 }
-                is com.babymomo.app.core.interactive.BabyWidget.Button -> {
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.buttonColors(containerColor = BabyPurple),
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                    ) {
-                        Text(widget.label, color = DarkOnBg)
+            )
+        }
+        is BabyWidget.BabyButton -> {
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(containerColor = BabyPurple),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(widget.label, color = DarkOnBg)
+            }
+        }
+        is BabyWidget.BabyInput -> {
+            OutlinedTextField(
+                value = "",
+                onValueChange = { },
+                label = { Text(widget.hint) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BabyPurple,
+                    unfocusedBorderColor = DarkSurfaceVariant,
+                    cursorColor = BabyPurple
+                )
+            )
+        }
+        is BabyWidget.BabyProgress -> {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                if (widget.label.isNotBlank()) {
+                    Text(widget.label, style = MaterialTheme.typography.bodySmall, color = DarkOnSurface)
+                }
+                LinearProgressIndicator(
+                    progress = { if (widget.max > 0) widget.value.toFloat() / widget.max.toFloat() else 0f },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = BabyPurple,
+                    trackColor = DarkSurfaceVariant
+                )
+            }
+        }
+        is BabyWidget.BabyDivider -> {
+            HorizontalDivider(color = DarkSurfaceVariant, modifier = Modifier.fillMaxWidth())
+        }
+        is BabyWidget.BabyList -> {
+            widget.items.forEach { item ->
+                TextButton(onClick = { }) {
+                    Text(item.text, color = BabyPurple)
+                }
+            }
+        }
+        is BabyWidget.BabyCard -> {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = DarkSurfaceVariant),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    if (widget.title.isNotBlank()) {
+                        Text(widget.title, style = MaterialTheme.typography.titleMedium, color = DarkOnBg)
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                    if (widget.body.isNotBlank()) {
+                        Text(widget.body, style = MaterialTheme.typography.bodyMedium, color = DarkOnSurface)
+                    }
+                    if (widget.children.isNotEmpty()) {
+                        WidgetList(widgets = widget.children, modifier = Modifier.padding(top = 8.dp))
                     }
                 }
-                is com.babymomo.app.core.interactive.BabyWidget.Input -> {
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { },
-                        label = { Text(widget.placeholder) },
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BabyPurple,
-                            unfocusedBorderColor = DarkSurfaceVariant,
-                            cursorColor = BabyPurple
-                        )
-                    )
-                }
-                is com.babymomo.app.core.interactive.BabyWidget.Progress -> {
-                    LinearProgressIndicator(
-                        progress = { widget.value.toFloat() / 100f },
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        color = BabyPurple,
-                        trackColor = DarkSurfaceVariant
-                    )
-                }
-                is com.babymomo.app.core.interactive.BabyWidget.Spacer -> {
-                    Spacer(modifier = Modifier.height(widget.heightDp.dp))
-                }
-                is com.babymomo.app.core.interactive.BabyWidget.Row -> {
-                    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                        widget.children.forEach { childWidget ->
-                            InteractiveScreenRenderer(
-                                descriptor = ScreenDescriptor(title = "", widgets = listOf(childWidget)),
-                                modifier = Modifier.weight(1f)
-                            )
+            }
+        }
+        is BabyWidget.BabyGrid -> {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                widget.children.chunked(widget.columns.coerceAtLeast(1)).forEach { row ->
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        row.forEach { child ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                WidgetItem(widget = child)
+                            }
                         }
                     }
                 }

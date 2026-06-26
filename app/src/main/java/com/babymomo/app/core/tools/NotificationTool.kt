@@ -14,5 +14,5 @@ class NotificationTool @Inject constructor() : ToolExecutor {
         """{"type":"object","properties":{"title":{"type":"string"},"body":{"type":"string"}}}"""
     ).jsonObject
 
-    suspend fun execute(input: String): String = "Notification posted (mock)"
+    override suspend fun execute(input: String): String = "Notification posted (mock)"
 }

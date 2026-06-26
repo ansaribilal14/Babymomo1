@@ -15,7 +15,7 @@ class WebSearchTool @Inject constructor() : ToolExecutor {
         """{"type":"object","properties":{"query":{"type":"string"}},"required":["query"]}"""
     ).jsonObject
 
-    suspend fun execute(input: String): String {
+    override suspend fun execute(input: String): String {
         val query = try {
             Json.parseToJsonElement(input).jsonObject["query"]?.jsonPrimitive?.content ?: input
         } catch (_: Exception) { input }

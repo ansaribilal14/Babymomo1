@@ -14,5 +14,5 @@ class MemoryTool @Inject constructor() : ToolExecutor {
         """{"type":"object","properties":{"content":{"type":"string"},"type":{"type":"string"}}}"""
     ).jsonObject
 
-    suspend fun execute(input: String): String = "Memory stored (mock)"
+    override suspend fun execute(input: String): String = "Memory stored (mock)"
 }

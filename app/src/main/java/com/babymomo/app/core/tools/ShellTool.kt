@@ -15,7 +15,7 @@ class ShellTool @Inject constructor() : ToolExecutor {
         """{"type":"object","properties":{"command":{"type":"string"}},"required":["command"]}"""
     ).jsonObject
 
-    suspend fun execute(input: String): String {
+    override suspend fun execute(input: String): String {
         val cmd = try {
             Json.parseToJsonElement(input).jsonObject["command"]?.jsonPrimitive?.content ?: input
         } catch (_: Exception) { input }
