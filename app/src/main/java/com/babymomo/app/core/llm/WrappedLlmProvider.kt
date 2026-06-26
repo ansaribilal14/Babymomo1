@@ -30,7 +30,7 @@ class WrappedLlmProvider @Inject constructor(
         messages: List<Message>,
         tools: List<Tool>
     ): Flow<LlmChunk> = flow {
-        val enrichedSystemPrompt = buildSystemPrompt(messages)
+        val enrichedSystemPrompt = buildSystemPrompt(systemPrompt, messages)
         emitAll(llmChain.streamChat(enrichedSystemPrompt, messages, tools))
     }.flowOn(Dispatchers.IO)
 
@@ -41,7 +41,7 @@ class WrappedLlmProvider @Inject constructor(
     override fun isAvailable(): Boolean = llmChain.isAvailable()
     override fun providerName(): String = "Wrapped(${llmChain.providerName()})"
 
-    private suspend fun buildSystemPrompt(messages: List<Message>): String {
+    private suspend fun buildSystemPrompt(systemPrompt: String, messages: List<Message>): String {
         val sb = StringBuilder()
 
         sb.append("[CORE SOUL]\n").append(soulPrompt).append("\n\n")

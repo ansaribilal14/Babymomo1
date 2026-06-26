@@ -45,7 +45,7 @@ fun ModelsScreen(viewModel: ModelsViewModel = hiltViewModel()) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text("Size: ${formatSize(model.sizeBytes)}", style = MaterialTheme.typography.bodySmall, color = DarkOnSurface)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEnd, horizontalAlignment = Alignment.CenterVertically) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                             if (model.isDownloaded) {
                                 TextButton(onClick = { viewModel.activateModel(model.id) }) {
                                     Text(if (model.isActive) "Active" else "Activate", color = if (model.isActive) DarkOnSurface else BabyPurple)

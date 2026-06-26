@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.*
-import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -94,50 +93,37 @@ class RemoteLlmProvider @Inject constructor() : LlmProvider {
                 return@flow
             }
 
-            val byteChannel = response.bodyAsChannel()
+            val rawText = response.bodyAsText()
             val buffer = StringBuilder()
-            while (isActive) {
-                val packet = try {
-                    byteChannel.readRemaining(4096)
-                } catch (e: Exception) {
-                    break
-                }
-                if (packet.remaining == 0L) break
-                val text = packet.readText()
-                buffer.append(text)
-                val lines = buffer.toString().split("\n")
-                buffer.clear()
-                buffer.append(lines.lastOrNull() ?: "")
-                for (line in lines.dropLast(1)) {
-                    val trimmed = line.trim()
-                    if (trimmed.startsWith("data: ")) {
-                        val data = trimmed.removePrefix("data: ")
-                        if (data == "[DONE]") {
-                            emit(LlmChunk.Done)
-                            return@flow
+            for (line in rawText.lines()) {
+                val trimmed = line.trim()
+                if (trimmed.startsWith("data: ")) {
+                    val data = trimmed.removePrefix("data: ")
+                    if (data == "[DONE]") {
+                        emit(LlmChunk.Done)
+                        return@flow
+                    }
+                    try {
+                        val json = Json.parseToJsonElement(data).jsonObject
+                        val delta = json["choices"]?.jsonArray?.firstOrNull()
+                            ?.jsonObject?.get("delta")?.jsonObject
+                        val content = delta?.get("content")?.jsonPrimitive?.content
+                        if (!content.isNullOrEmpty()) {
+                            emit(LlmChunk.Token(content))
                         }
-                        try {
-                            val json = Json.parseToJsonElement(data).jsonObject
-                            val delta = json["choices"]?.jsonArray?.firstOrNull()
-                                ?.jsonObject?.get("delta")?.jsonObject
-                            val content = delta?.get("content")?.jsonPrimitive?.content
-                            if (!content.isNullOrEmpty()) {
-                                emit(LlmChunk.Token(content))
+                        val toolCalls = delta?.get("tool_calls")?.jsonArray
+                        if (toolCalls != null) {
+                            for (tc in toolCalls) {
+                                val tcObj = tc.jsonObject
+                                val fn = tcObj["function"]?.jsonObject
+                                val id = tcObj["id"]?.jsonPrimitive?.content ?: ""
+                                val name = fn?.get("name")?.jsonPrimitive?.content ?: ""
+                                val args = fn?.get("arguments")?.jsonPrimitive?.content ?: "{}"
+                                emit(LlmChunk.ToolCall(id, name, args))
                             }
-                            val toolCalls = delta?.get("tool_calls")?.jsonArray
-                            if (toolCalls != null) {
-                                for (tc in toolCalls) {
-                                    val tcObj = tc.jsonObject
-                                    val fn = tcObj["function"]?.jsonObject
-                                    val id = tcObj["id"]?.jsonPrimitive?.content ?: ""
-                                    val name = fn?.get("name")?.jsonPrimitive?.content ?: ""
-                                    val args = fn?.get("arguments")?.jsonPrimitive?.content ?: "{}"
-                                    emit(LlmChunk.ToolCall(id, name, args))
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.w("RemoteLlm", "Parse error: ${e.message}")
                         }
+                    } catch (e: Exception) {
+                        Log.w("RemoteLlm", "Parse error: ${e.message}")
                     }
                 }
             }

@@ -5,7 +5,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.babymomo.app.core.interactive.InteractiveScreenParser
 import com.babymomo.app.ui.screens.chat.ChatScreen
 import com.babymomo.app.ui.screens.heartbeat.HeartbeatScreen
 import com.babymomo.app.ui.screens.interactive.InteractiveScreen
@@ -31,8 +30,7 @@ fun BabyMomoNavGraph(navController: NavHostController) {
         composable(Route.McpServers.route) { McpScreen() }
         composable(Route.Interactive.route) { backStackEntry ->
             val descriptor = backStackEntry.arguments?.getString("descriptor") ?: ""
-            val parser: InteractiveScreenParser = hiltViewModel()
-            InteractiveScreen(descriptorJson = descriptor, navController = navController, parser = parser)
+            InteractiveScreen(descriptorJson = descriptor, navController = navController)
         }
     }
 }

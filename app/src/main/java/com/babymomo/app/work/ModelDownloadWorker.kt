@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import androidx.work.withProgress
+import androidx.work.Data
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -16,7 +16,7 @@ class ModelDownloadWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val modelId = inputData.getString("model_id") ?: return Result.failure()
         for (i in 0..100 step 10) {
-            withProgress(i / 100f)
+            setProgress(Data.Builder().putFloat("progress", i / 100f).build())
             kotlinx.coroutines.delay(200)
         }
         return Result.success()
