@@ -77,12 +77,6 @@ fun ChatScreen(navController: NavController? = null, viewModel: ChatViewModel = 
                     modifier = Modifier.weight(1f),
                     placeholder = { Text("Ask BabyMomo anything...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     shape = RoundedCornerShape(24.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BabyPurple,
-                        unfocusedBorderColor = DarkOutline,
-                        textColor = DarkOnBg,
-                        cursorColor = BabyPurple
-                    ),
                     maxLines = 4
                 )
                 FilledIconButton(

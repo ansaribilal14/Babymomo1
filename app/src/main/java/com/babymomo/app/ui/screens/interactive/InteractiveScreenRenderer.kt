@@ -87,7 +87,7 @@ private fun RenderWidget(widget: BabyWidget, onAction: (String) -> Unit) {
         }
         is BabyWidget.BabyDivider -> { HorizontalDivider(color = DarkOutline, modifier = Modifier.padding(vertical = 8.dp)) }
         is BabyWidget.BabyInput -> {
-            OutlinedTextField(value = "", onValueChange = {}, label = { Text(widget.hint) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = DarkOutline, textColor = DarkOnBg))
+            OutlinedTextField(value = "", onValueChange = {}, label = { Text(widget.hint) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = DarkOutline))
         }
     }
 }

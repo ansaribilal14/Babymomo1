@@ -42,7 +42,7 @@ fun TerminalScreen(viewModel: TerminalViewModel = hiltViewModel()) {
             Row(modifier = Modifier.padding(12.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text("$ ", color = androidx.compose.ui.graphics.Color(0xFF00FF00), fontFamily = FontFamily.Monospace)
                 Spacer(modifier = Modifier.width(8.dp))
-                OutlinedTextField(value = input, onValueChange = { viewModel.updateInput(it) }, modifier = Modifier.weight(1f), placeholder = { Text("Enter command...", color = androidx.compose.ui.graphics.Color(0xFF666666)) }, singleLine = true, shape = RoundedCornerShape(4.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent), textColor = androidx.compose.ui.graphics.Color(0xFF00FF00))
+                OutlinedTextField(value = input, onValueChange = { viewModel.updateInput(it) }, modifier = Modifier.weight(1f), placeholder = { Text("Enter command...", color = androidx.compose.ui.graphics.Color(0xFF666666)) }, singleLine = true, shape = RoundedCornerShape(4.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent))
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = { viewModel.execute() }, colors = ButtonDefaults.buttonColors(containerColor = BabyPurple), shape = RoundedCornerShape(4.dp)) { Text("Run", color = DarkOnBg) }
             }

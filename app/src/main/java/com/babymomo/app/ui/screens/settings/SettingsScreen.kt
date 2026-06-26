@@ -56,7 +56,7 @@ fun SettingsScreen(navController: NavController? = null, viewModel: SettingsView
                 placeholder = { Text("Define BabyMomo's personality...") },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = DarkOutline, textColor = DarkOnBg
+                    unfocusedBorderColor = DarkOutline
                 )
             )
 
@@ -103,7 +103,7 @@ private fun ProviderCard(name: String, key: String, model: String, onKeyChange: 
                 label = { Text("API Key") }, modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = DarkOutline, textColor = DarkOnBg, focusedBorderColor = BabyPurple)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = DarkOutline)
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -111,7 +111,7 @@ private fun ProviderCard(name: String, key: String, model: String, onKeyChange: 
                 label = { Text("Model") }, modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = DarkOutline, textColor = DarkOnBg, focusedBorderColor = BabyPurple)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = DarkOutline)
             )
         }
     }

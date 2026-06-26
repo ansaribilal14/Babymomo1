@@ -55,7 +55,7 @@ fun MemoryScreen(viewModel: MemoryViewModel = hiltViewModel()) {
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = DarkOutline, textColor = DarkOnBg
+                unfocusedBorderColor = DarkOutline
             )
         )
         Spacer(modifier = Modifier.height(8.dp))

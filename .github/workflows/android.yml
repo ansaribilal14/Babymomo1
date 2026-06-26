@@ -1,9 +1,9 @@
 name: Build & Release APK
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-    tags: ['v*']
 
 jobs:
   build:
@@ -21,27 +21,29 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.4'
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Build APK
+        run: ./gradlew assembleDebug --stacktrace 2>&1
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
+      - name: List APK outputs
+        run: find app/build/outputs/apk -name '*.apk' -ls 2>&1 || echo 'No APK found'
 
-      - name: Upload Debug APK to Release
+      - name: Generate version tag
+        id: version
+        run: echo "TAG_NAME=v1.0.0-$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: "BabyMomo v1.0.0"
+          tag_name: ${{ steps.version.outputs.TAG_NAME }}
+          name: "BabyMomo ${{ steps.version.outputs.TAG_NAME }}"
           body: |
-            ## BabyMomo v1.0.0 — First Release
+            ## BabyMomo — AI Companion for Android
 
-            A private AI companion for Android with bi-temporal memory, on-device inference, and interactive UI generation.
+            Private AI companion with bi-temporal memory, on-device inference, and interactive UI generation.
 
             ### Features
             - Streaming chat with memory citations
@@ -50,14 +52,12 @@ jobs:
             - LLM provider chain (Local → Remote → Mock)
             - OpenAI / NVIDIA NIM / OpenRouter support
             - 5 specialist agents + 6 skills + 5 tools
-            - Interactive AI-generated screens (quizzes, dashboards, games)
+            - Interactive AI-generated screens
             - Linux sandbox (proot Alpine)
             - Heartbeat autonomous check-ins
             - SQLCipher encrypted database
             - Dark purple theme
-          files: |
-            app/build/outputs/apk/debug/app-debug.apk
-            app/build/outputs/apk/release/app-release.apk
+          files: app/build/outputs/apk/debug/app-debug.apk
           draft: false
           prerelease: false
         env:
