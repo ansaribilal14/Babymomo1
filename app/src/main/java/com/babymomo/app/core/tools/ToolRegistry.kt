@@ -12,11 +12,11 @@ class ToolRegistry @Inject constructor(
     private val shellTool: ShellTool,
     private val memoryTool: MemoryTool
 ) {
-    private val tools = listOf(webSearchTool, notificationTool, calendarTool, shellTool, memoryTool)
+    private val toolList = listOf(webSearchTool, notificationTool, calendarTool, shellTool, memoryTool)
 
-    fun getAllTools(): List<Tool> = tools.map { Tool(it.name, it.description, it.parameters) }
+    fun getAllTools(): List<Tool> = toolList.map { Tool(it.name, it.description, it.parameters) }
 
     suspend fun execute(name: String, input: String): String {
-        return tools.find { it.name == name }?.execute(input) ?: "Tool not found: $name"
+        return toolList.find { it.name == name }?.execute(input) ?: "Tool not found: $name"
     }
 }

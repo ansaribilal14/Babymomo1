@@ -5,7 +5,11 @@ import com.babymomo.app.core.llm.model.Message
 import com.babymomo.app.core.llm.model.Tool
 import com.babymomo.app.core.memory.MemoryService
 import com.babymomo.app.core.projects.ProjectContextProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.emitAll
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -25,10 +29,10 @@ class WrappedLlmProvider @Inject constructor(
         systemPrompt: String,
         messages: List<Message>,
         tools: List<Tool>
-    ): Flow<LlmChunk> {
+    ): Flow<LlmChunk> = flow {
         val enrichedSystemPrompt = buildSystemPrompt(messages)
-        return llmChain.streamChat(enrichedSystemPrompt, messages, tools)
-    }
+        emitAll(llmChain.streamChat(enrichedSystemPrompt, messages, tools))
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun complete(prompt: String): String {
         return llmChain.complete(prompt)

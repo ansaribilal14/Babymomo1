@@ -9,13 +9,13 @@ import io.ktor.client.engine.okhttp.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.*
+import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -66,11 +66,13 @@ class RemoteLlmProvider @Inject constructor() : LlmProvider {
                     for (tool in tools) {
                         addJsonObject {
                             put("type", "function")
-                            putJsonObject("function") {
+                            put("function", buildJsonObject {
                                 put("name", tool.name)
                                 put("description", tool.description)
-                                put("parameters", Json.encodeToJsonElement(tool.parameters))
-                            }
+                                if (tool.parameters != null) {
+                                    put("parameters", tool.parameters)
+                                }
+                            })
                         }
                     }
                 }
@@ -92,10 +94,15 @@ class RemoteLlmProvider @Inject constructor() : LlmProvider {
                 return@flow
             }
 
-            val channel = response.bodyAsChannel()
+            val byteChannel = response.bodyAsChannel()
             val buffer = StringBuilder()
-            while (!channel.isClosedForRead && isActive) {
-                val packet = channel.readRemaining(4096)
+            while (isActive) {
+                val packet = try {
+                    byteChannel.readRemaining(4096)
+                } catch (e: Exception) {
+                    break
+                }
+                if (packet.remaining == 0L) break
                 val text = packet.readText()
                 buffer.append(text)
                 val lines = buffer.toString().split("\n")

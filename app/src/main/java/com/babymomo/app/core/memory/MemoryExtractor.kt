@@ -19,7 +19,8 @@ class MemoryExtractor @Inject constructor(
     private val memoryVectorDao: MemoryVectorDao,
     private val entityDao: EntityDao,
     private val relationDao: RelationDao,
-    private val mockEmbedder: MockEmbedder
+    private val mockEmbedder: MockEmbedder,
+    private val vectorIndex: VectorIndex
 ) {
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -95,7 +96,7 @@ class MemoryExtractor @Inject constructor(
                 memoryVectorDao.insert(
                     MemoryVectorEntity(
                         id = UUID.randomUUID().toString(),
-                        memoryId = memId, embedding = embedding
+                        memoryId = memId, embedding = vectorIndex.floatArrayToByteArray(embedding)
                     )
                 )
             }
