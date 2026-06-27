@@ -1,10 +1,14 @@
 package com.babymomo.app.core.kernel
 
+import javax.inject.Inject
+import javax.inject.Singleton
+
 enum class RequestType {
     CHAT, SKILL, AGENT, INTERACTIVE
 }
 
-class RequestClassifier {
+@Singleton
+class RequestClassifier @Inject constructor() {
 
     fun classify(input: String): RequestType {
         val lower = input.lowercase()
